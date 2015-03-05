@@ -11,9 +11,9 @@ function starFieldGenerator.new(numberOfStars,theView,starSpeed)
 		local star = display.newCircle(math.random(display.contentWidth), math.random(display.contentHeight), math.random(2,8))
 		star:setFillColor(1 ,1,1)
 		starGroup:insert(star)
-		theView:insert(starGroup)
 		table.insert(allStars,star)
     end
+     theView:insert(starGroup)
 	  local newStarFieldGenerator = {
                                                					allStars    =  allStars,
                                                					starSpeed = starSpeed

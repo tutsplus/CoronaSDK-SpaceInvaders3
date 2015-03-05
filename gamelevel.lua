@@ -49,7 +49,8 @@ function scene:show( event )
 	    Runtime:addEventListener("enterFrame", gameLoop)
      	Runtime:addEventListener("enterFrame", starGenerator)
 		 Runtime:addEventListener("tap", firePlayerBullet)
-		 Runtime:addEventListener( "collision", onCollision )		-- invaderFireTimer =    timer.performWithDelay(1500, fireInvaderBullet,-1)
+		 Runtime:addEventListener( "collision", onCollision )
+		--invaderFireTimer =    timer.performWithDelay(1500, fireInvaderBullet,-1)
 	   end
 end
 
@@ -60,7 +61,8 @@ function scene:hide( event )
        	Runtime:removeEventListener("enterFrame", starGenerator)
        	Runtime:removeEventListener("tap", firePlayerBullet)
        	Runtime:removeEventListener("enterFrame", gameLoop)
-       	Runtime:removeEventListener( "collision", onCollision )       	--timer.cancel(invaderFireTimer)
+       	Runtime:removeEventListener( "collision", onCollision )
+       	--timer.cancel(invaderFireTimer)
     end
 end
 function setupPlayer()
@@ -137,8 +139,10 @@ function checkPlayerBulletsOutOfBounds()
 end
 
 function gameLoop()
-    checkPlayerBulletsOutOfBounds()
-	moveInvaders()	checkInvaderBulletsOutOfBounds()
+
+    checkPlayerBulletsOutOfBounds()
+	moveInvaders()
+	checkInvaderBulletsOutOfBounds()
 end
 
 function setupInvaders()
@@ -188,11 +192,13 @@ function onCollision( event )
    end
 	 params.theInvader.isVisible = false
      physics.removeBody(  params.theInvader )
-      table.remove(invadersWhoCanFire,table.indexOf(invadersWhoCanFire,params.theInvader))
+     table.remove(invadersWhoCanFire,table.indexOf(invadersWhoCanFire,params.theInvader))
+      if(table.indexOf(playerBullets,params.thePlayerBullet)~=nil)then
 	  physics.removeBody(params.thePlayerBullet)
 	  table.remove(playerBullets,table.indexOf(playerBullets,params.thePlayerBullet))
 	  display.remove(params.thePlayerBullet)
 	  params.thePlayerBullet = nil
+	end
 	  end
 	  
       if ( event.phase == "began" ) then
@@ -203,7 +209,9 @@ function onCollision( event )
    	  if(event.object1.name == "playerBullet" and event.object2.name == "invader") then
 			local tm = timer.performWithDelay(10, removeInvaderAndPlayerBullet,1)
 			tm.params = {theInvader = event.object2 , thePlayerBullet = event.object1}
-   	  end   	     	    if(event.object1.name == "player" and event.object2.name == "invaderBullet") then
+   	  end
+   	  
+   	    if(event.object1.name == "player" and event.object2.name == "invaderBullet") then
 
   	  	table.remove(invaderBullets,table.indexOf(invaderBullets,event.object2))
   	  	event.object2:removeSelf()
@@ -223,7 +231,9 @@ function onCollision( event )
   	      --   killPlayer()
   	  	end
   	  	return
-  	   end  	     	   if(event.object1.name == "player" and event.object2.name == "invader") then
+  	   end
+  	   
+  	   if(event.object1.name == "player" and event.object2.name == "invader") then
 				numberOfLives = 0
 				killPlayer()
   	    end
@@ -231,9 +241,11 @@ function onCollision( event )
   	     if(event.object1.name == "invader" and event.object2.name == "player") then
 				numberOfLives = 0
 				killPlayer()
-  	    end  	 end
+  	    end
+  	 end
 end	
-function fireInvaderBullet()
+
+function fireInvaderBullet()
 	if(#invadersWhoCanFire >0) then
 		local randomIndex = math.random(#invadersWhoCanFire)
 		local randomInvader = invadersWhoCanFire[randomIndex]
@@ -245,11 +257,14 @@ end
     	tempInvaderBullet.isBullet = true
    	 tempInvaderBullet.isSensor = true
   	 tempInvaderBullet:setLinearVelocity( 0,400)
-   	 table.insert(invaderBullets, tempInvaderBullet)
+   	 table.insert(invaderBullets, tempInvaderBullet)
+
 	else
 		levelComplete()
 	end  
-endfunction checkInvaderBulletsOutOfBounds()
+end
+
+function checkInvaderBulletsOutOfBounds()
 	if (#invaderBullets > 0) then
 		for i=#invaderBullets,1,-1 do
 			if(invaderBullets[i].y > display.contentHeight) then
@@ -259,7 +274,10 @@ endfunction checkInvaderBulletsOutOfBounds()
 			end
 		end
 	end
-endfunction killPlayer()
+end
+
+
+function killPlayer()
 	numberOfLives = numberOfLives- 1;
   	 if(numberOfLives <= 0) then
           gameData.invaderNum  = 1
@@ -269,7 +287,9 @@ endfunction killPlayer()
           spawnNewPlayer()
 
   	end
-endfunction spawnNewPlayer()
+end
+
+function spawnNewPlayer()
 	local numberOfTimesToFadePlayer = 5
 	local numberOfTimesPlayerHasFaded = 0
 	local  function fadePlayer()
@@ -288,7 +308,8 @@ local function onAccelerate( event )
 
 	player.x = display.contentCenterX + (display.contentCenterX * (event.xGravity*2))
 end
-function levelComplete()
+
+function levelComplete()
      gameData.invaderNum  = gameData.invaderNum  + 1
      if(gameData.invaderNum  <= gameData.maxLevels) then
 	 	composer.gotoScene("gameover")
@@ -296,7 +317,9 @@ end
 	     gameData.invaderNum  = 1
 	 	composer.gotoScene("start")
      end
-end
+end
+
+
 system.setAccelerometerInterval( 60 )
 
 Runtime:addEventListener ("accelerometer", onAccelerate)
