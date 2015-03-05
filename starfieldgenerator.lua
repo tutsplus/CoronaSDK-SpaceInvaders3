@@ -22,20 +22,9 @@ function starFieldGenerator.new(numberOfStars,theView,starSpeed)
 return setmetatable(newStarFieldGenerator,starFieldGenerator_mt)
 end
 
-
-function starFieldGenerator:enterFrame()
-	self:moveStars()
-	self:checkStarsOutOfBounds()
-end
-
-
-function starFieldGenerator:moveStars()
-        for i=1, #self.allStars do
-              self.allStars[i].y = self.allStars[i].y+self.starSpeed
-        end
-
-end
-function  starFieldGenerator:checkStarsOutOfBounds()
+function starFieldGenerator:enterFrame()	self:moveStars()	self:checkStarsOutOfBounds()end
+function starFieldGenerator:moveStars()
+        for i=1, #self.allStars do              self.allStars[i].y = self.allStars[i].y+self.starSpeed        endendfunction  starFieldGenerator:checkStarsOutOfBounds()
 	for i=1, #self.allStars do
 		if(self.allStars[i].y > display.contentHeight) then
 			self.allStars[i].x  = math.random(display.contentWidth)
